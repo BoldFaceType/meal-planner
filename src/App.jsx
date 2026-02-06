@@ -63,6 +63,7 @@ function NavIcon({ icon, label, isActive, onClick }) {
   return (
     <button
       onClick={onClick}
+      aria-label={label}
       style={{
         background: 'none',
         border: 'none',
