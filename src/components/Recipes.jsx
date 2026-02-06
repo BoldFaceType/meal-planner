@@ -160,6 +160,29 @@ function EditRecipeModal({ recipe, onSave, onClose, onDelete }) {
         });
     };
 
+    const [bulkInput, setBulkInput] = useState('');
+    const [showBulk, setShowBulk] = useState(false);
+
+    const parseBulkIngredients = () => {
+        const lines = bulkInput.split('\n').filter(l => l.trim());
+        const parsed = lines.map(line => {
+            // Basic regex: (number/fraction) (unit)? (name)
+            // Matches "1 1/2 cups of flour" or "2 chicken breasts"
+            const match = line.match(/^([\d\/\s\.]+)?\s*([a-zA-Z.]+)?\s*(.*)$/);
+            if (match) {
+                return {
+                    amount: match[1]?.trim() || '',
+                    unit: match[2]?.trim() || '',
+                    name: match[3]?.trim() || line.trim()
+                };
+            }
+            return { name: line.trim(), amount: '', unit: '' };
+        });
+        setFormData({ ...formData, ingredients: [...formData.ingredients, ...parsed] });
+        setBulkInput('');
+        setShowBulk(false);
+    };
+
     return (
         <div style={{
             position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -203,10 +226,29 @@ function EditRecipeModal({ recipe, onSave, onClose, onDelete }) {
                     </div>
 
                     <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <h4>Ingredients</h4>
-                            <button onClick={addIngredient} style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer' }}>+ Add</button>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', alignItems: 'center' }}>
+                            <h4 style={{ margin: 0 }}>Ingredients</h4>
+                            <div style={{ display: 'flex', gap: '10px' }}>
+                                <button onClick={() => setShowBulk(!showBulk)} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: '0.8rem' }}>
+                                    {showBulk ? 'Hide Bulk' : 'Bulk Add'}
+                                </button>
+                                <button onClick={addIngredient} style={{ background: 'transparent', border: 'none', color: 'var(--accent-primary)', cursor: 'pointer' }}>+ Add</button>
+                            </div>
                         </div>
+
+                        {showBulk && (
+                            <div style={{ marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <textarea 
+                                    className="glass-panel"
+                                    style={{ width: '100%', padding: '12px', color: 'white', background: 'rgba(0,0,0,0.3)', minHeight: '100px', fontSize: '0.9rem', boxSizing: 'border-box' }}
+                                    placeholder="Paste ingredients list...&#10;2 cups rice&#10;1 lb chicken"
+                                    value={bulkInput}
+                                    onChange={e => setBulkInput(e.target.value)}
+                                />
+                                <button className="btn-primary" style={{ padding: '8px', fontSize: '0.8rem' }} onClick={parseBulkIngredients}>Parse & Add</button>
+                            </div>
+                        )}
+
                         {formData.ingredients.map((ing, i) => (
                             <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
                                 <input style={{ width: '60px', padding: '8px', background: 'rgba(0,0,0,0.2)', border: 'none', color: 'white', borderRadius: '6px' }} placeholder="Qty" value={ing.amount} onChange={e => updateIngredient(i, 'amount', e.target.value)} />

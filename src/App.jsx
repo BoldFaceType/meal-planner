@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import './App.css'
 import { Utensils, ShoppingCart, User, ChefHat } from 'lucide-react'
-import People from './components/FamilyProfiles'
+import FamilyProfiles from './components/FamilyProfiles'
+import Recipes from './components/Recipes'
+import MealPlanner from './components/MealPlanner'
+import GroceryList from './components/GroceryList'
+import { motion, AnimatePresence } from 'framer-motion'
 
 function App() {
   const [activeTab, setActiveTab] = useState('plan')
@@ -17,21 +21,20 @@ function App() {
           <p style={{ color: 'var(--text-secondary)' }}>Vibe coded planner</p>
         </header>
 
-        {activeTab === 'plan' && (
-          <div className="glass-panel" style={{ padding: '2rem', height: '300px' }}>
-            <h2>Weekly Plan</h2>
-            <p>Drag & Drop UI coming soon...</p>
-          </div>
-        )}
-
-        {activeTab === 'profile' && <People />}
-
-        {activeTab === 'shop' && (
-          <div className="glass-panel" style={{ padding: '2rem' }}>
-            <h2>Grocery List</h2>
-            <p>Smart aggregation pending...</p>
-          </div>
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, x: 10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activeTab === 'plan' && <MealPlanner />}
+            {activeTab === 'recipes' && <Recipes />}
+            {activeTab === 'profile' && <FamilyProfiles />}
+            {activeTab === 'shop' && <GroceryList />}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Bottom Navigation (Glassmorphism) */}
