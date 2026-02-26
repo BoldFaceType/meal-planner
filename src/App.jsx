@@ -5,6 +5,7 @@ import FamilyProfiles from './components/FamilyProfiles'
 import Recipes from './components/Recipes'
 import MealPlanner from './components/MealPlanner'
 import GroceryList from './components/GroceryList'
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion'
 
 function App() {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Plus, Search, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 export default function Recipes() {
@@ -168,7 +169,7 @@ function EditRecipeModal({ recipe, onSave, onClose, onDelete }) {
         const parsed = lines.map(line => {
             // Basic regex: (number/fraction) (unit)? (name)
             // Matches "1 1/2 cups of flour" or "2 chicken breasts"
-            const match = line.match(/^([\d\/\s\.]+)?\s*([a-zA-Z.]+)?\s*(.*)$/);
+            const match = line.match(new RegExp('^([\\\\d/\\\\s.]+)?\\\\s*([a-zA-Z.]+)?\\\\s*(.*)$'));
             if (match) {
                 return {
                     amount: match[1]?.trim() || '',

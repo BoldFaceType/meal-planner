@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 import { Plus, X, Edit2 } from 'lucide-react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DIET_OPTIONS = ['None', 'Keto', 'Vegan', 'Vegetarian', 'Paleo', 'Gluten-Free'];
