@@ -166,18 +166,32 @@ function EditRecipeModal({ recipe, onSave, onClose, onDelete }) {
 
     const parseBulkIngredients = () => {
         const lines = bulkInput.split('\n').filter(l => l.trim());
-        const parsed = lines.map(line => {
-            // Basic regex: (number/fraction) (unit)? (name)
-            // Matches "1 1/2 cups of flour" or "2 chicken breasts"
-            const match = line.match(new RegExp('^([\\\\d/\\\\s.]+)?\\\\s*([a-zA-Z.]+)?\\\\s*(.*)$'));
-            if (match) {
-                return {
-                    amount: match[1]?.trim() || '',
-                    unit: match[2]?.trim() || '',
-                    name: match[3]?.trim() || line.trim()
-                };
+        const knownUnits = new Set([
+            'tsp', 'tbsp', 'cup', 'cups', 'oz', 'lb', 'lbs', 'g', 'kg', 'ml', 'l', 'clove', 'cloves', 'can', 'cans'
+        ]);
+        const descriptors = new Set(['small', 'medium', 'large']);
+
+        const parsed = lines.map(rawLine => {
+            const line = rawLine.trim();
+            const amountMatch = line.match(/^(\d+(?:\.\d+)?(?:\s+\d+\/\d+)?|\d+\/\d+)\s+(.*)$/);
+            const amount = amountMatch ? amountMatch[1].trim() : '';
+            const rest = amountMatch ? amountMatch[2].trim() : line;
+
+            const words = rest.split(/\s+/).filter(Boolean);
+            const firstWord = words[0]?.toLowerCase().replace(/\.$/, '');
+            const hasUnit = firstWord && knownUnits.has(firstWord);
+            const unit = hasUnit ? words[0] : '';
+            let nameWords = hasUnit ? words.slice(1) : words;
+
+            while (nameWords.length > 1 && descriptors.has(nameWords[0].toLowerCase())) {
+                nameWords = nameWords.slice(1);
             }
-            return { name: line.trim(), amount: '', unit: '' };
+
+            return {
+                amount,
+                unit,
+                name: nameWords.join(' ').trim() || rest
+            };
         });
         setFormData({ ...formData, ingredients: [...formData.ingredients, ...parsed] });
         setBulkInput('');
